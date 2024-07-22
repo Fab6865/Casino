@@ -1,0 +1,843 @@
+<html><head><base href="https://casino-games-simulator.com">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casino Games Simulator</title>
+<style>
+  :root {
+    --primary-color: #d4af37;
+    --secondary-color: #800020;
+    --background-color: #1a1a1a;
+    --text-color: #ffffff;
+  }
+
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    flex-grow: 1;
+  }
+
+  header {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    padding: 20px 0;
+    text-align: center;
+  }
+
+  h1, h2 {
+    margin: 0;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .game-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+  }
+
+  .game, .shop {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    width: 45%;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game h2, .shop h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+    font-size: 1.5em;
+  }
+
+  .game-area {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  button {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    margin-top: 10px;
+  }
+
+  button:hover {
+    background-color: #f1c232;
+  }
+
+  button:active {
+    transform: scale(0.98);
+  }
+
+  footer {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    text-align: center;
+    padding: 10px 0;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .game, .shop {
+      width: 100%;
+    }
+  }
+
+  #penalty-field {
+    width: 300px;
+    height: 200px;
+    background-color: #4a4a4a;
+    position: relative;
+    overflow: hidden;
+    cursor: crosshair;
+  }
+
+  #goal {
+    width: 200px;
+    height: 60px;
+    background-color: #ffffff;
+    position: absolute;
+    top: 0;
+    left: 50px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .goal-zone {
+    width: 33.33%;
+    height: 100%;
+    border: 1px solid #4a4a4a;
+  }
+
+  #ball {
+    width: 20px;
+    height: 20px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 10px;
+    left: 140px;
+    transition: all 0.5s ease;
+  }
+
+  #goalkeeper {
+    width: 40px;
+    height: 40px;
+    background-color: #ff0000;
+    position: absolute;
+    top: 10px;
+    left: 130px;
+    transition: all 0.5s ease;
+  }
+
+  #aviator-plane {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transition: transform 0.1s ease-out;
+  }
+
+  #mines-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+
+  .mine-cell {
+    width: 40px;
+    height: 40px;
+    background-color: #4a4a4a;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  #aviator-container {
+    width: 100%;
+    height: 200px;
+    background-color: #4a4a4a;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #aviator-plane {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transition: transform 0.1s ease-out;
+  }
+
+  #aviator-multiplier {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-color);
+  }
+
+  #aviator-bet, #mines-bet, #penalty-bet, #dice-bet {
+    width: 100px;
+    padding: 5px;
+    margin-right: 10px;
+  }
+
+  #mines-info, #penalty-info, #dice-info {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  #player-info {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  #player-info span {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 5px 10px;
+  }
+
+  #bank-controls {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+
+  #bank-amount {
+    width: 100px;
+    padding: 5px;
+    margin-right: 10px;
+  }
+
+  #dice-container {
+    width: 100%;
+    height: 200px;
+    background-color: #4a4a4a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  #dice {
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 48px;
+    font-weight: bold;
+    color: black;
+  }
+
+  #dice-multiplier {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-color);
+  }
+
+  .shop-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .shop-item {
+    background-color: #3a3a3a;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+  }
+
+  .shop-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .shop-item h3 {
+    margin: 0;
+    font-size: 1.2em;
+    color: var(--primary-color);
+  }
+
+  .shop-item p {
+    margin: 5px 0;
+  }
+
+  .shop-item button {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  #inventory {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+  }
+
+  #inventory h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+  }
+
+  #inventory-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .inventory-item {
+    background-color: #3a3a3a;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .inventory-item img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 5px;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Casino Games Simulator</h1>
+  </header>
+
+  <div class="container">
+    <div id="player-info">
+      <span>Balance: $<span id="player-balance">1000</span></span>
+      <span>Bank: $<span id="player-bank">0</span></span>
+      <span>Level: <span id="player-level">1</span></span>
+      <div id="bank-controls">
+        <input type="number" id="bank-amount" placeholder="Amount" min="1" value="100">
+        <button onclick="deposit()">Deposit</button>
+        <button onclick="withdraw()">Withdraw</button>
+      </div>
+      <button onclick="saveGame()">Save Game</button>
+      <button onclick="loadGame()">Load Game</button>
+    </div>
+
+    <div class="game-container">
+      <div class="game">
+        <h2>Penalty Shooter</h2>
+        <div class="game-area">
+          <div id="penalty-field">
+            <div id="goal">
+              <div class="goal-zone" data-zone="left"></div>
+              <div class="goal-zone" data-zone="center"></div>
+              <div class="goal-zone" data-zone="right"></div>
+            </div>
+            <div id="goalkeeper"></div>
+            <div id="ball"></div>
+          </div>
+        </div>
+        <input type="number" id="penalty-bet" placeholder="Mise" min="1" value="10">
+        <button onclick="startPenaltyGame()">Start Game</button>
+        <button onclick="cashoutPenalty()">Cash Out</button>
+        <div id="penalty-info"></div>
+      </div>
+
+      <div class="game">
+        <h2>Aviator</h2>
+        <div class="game-area">
+          <div id="aviator-container">
+            <svg id="aviator-plane" viewBox="0 0 24 24" width="50" height="50">
+              <path fill="#d4af37" d="M21,16V14L13,9V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V9L2,14V16L10,13.5V19L8,20.5V22L11.5,21L15,22V20.5L13,19V13.5L21,16Z" />
+            </svg>
+            <div id="aviator-multiplier">x1.00</div>
+          </div>
+        </div>
+        <input type="number" id="aviator-bet" placeholder="Mise" min="1" value="10">
+        <button onclick="startAviator()">Start Aviator</button>
+        <button onclick="cashoutAviator()">Cash Out</button>
+      </div>
+
+      <div class="game">
+        <h2>Dice Roll</h2>
+        <div class="game-area">
+          <div id="dice-container">
+            <div id="dice">1</div>
+            <div id="dice-multiplier">x1.00</div>
+          </div>
+        </div>
+        <input type="number" id="dice-bet" placeholder="Mise" min="1" value="10">
+        <button onclick="startDiceRoll()">Roll Dice</button>
+        <button onclick="cashoutDice()">Cash Out</button>
+        <div id="dice-info"></div>
+      </div>
+
+      <div class="game">
+        <h2>Mines</h2>
+        <div class="game-area">
+          <div id="mines-grid"></div>
+        </div>
+        <input type="number" id="mines-bet" placeholder="Mise" min="1" value="10">
+        <button onclick="resetMines()">New Game</button>
+        <button onclick="cashoutMines()">Cash Out</button>
+        <div id="mines-info"></div>
+      </div>
+
+      <div class="shop">
+        <h2>Luxury Shop</h2>
+        <div class="shop-items">
+          <div class="shop-item">
+            <img src="https://www.bijouxmedusa.fr/cdn/shop/products/rolex-submariner-40mm-2-tons-bleu-montre-or-bijoux-medusa-homme-quebec-canada-691_800x.jpg?v=1614137232" alt="Rolex Submariner luxury watch" width="200" height="150">
+            <h3>Rolex Submariner</h3>
+            <p>Price: $10,000</p>
+            <button onclick="buyItem('Rolex Submariner', 10000)">Buy Now</button>
+          </div>
+          <div class="shop-item">
+            <img src="https://bringatrailer.com/wp-content/uploads/2023/09/2018_ferrari_488-gtb_1030_web-57803.jpg?fit=940%2C627" alt="Ferrari 488 GTB luxury sports car" width="200" height="150">
+            <h3>Ferrari 488 GTB</h3>
+            <p>Price: $300,000</p>
+            <button onclick="buyItem('Ferrari 488 GTB', 300000)">Buy Now</button>
+          </div>
+          <div class="shop-item">
+            <img src="https://xclusiveyachts.com/photo/blog/257/webp/720/1.webp" alt="Luxury yacht" width="200" height="150">
+            <h3>Luxury Yacht</h3>
+            <p>Price: $5,000,000</p>
+            <button onclick="buyItem('Luxury Yacht', 5000000)">Buy Now</button>
+          </div>
+          <div class="shop-item">
+            <img src="https://www.newzealand.com/assets/externally-managed-assets/tbd-assets/tbd-folder-10020511/img-1713759516-6294-1760814-tbd-asset__aWxvdmVrZWxseQo_CropResizeWzE5MDAsMTAwMCw3NSwianBnIl0.jpg" alt="Private jet" width="200" height="150">
+            <h3>Private Jet</h3>
+            <p>Price: $20,000,000</p>
+            <button onclick="buyItem('Private Jet', 20000000)">Buy Now</button>
+          </div>
+          <div class="shop-item">
+            <img src="https://loveincorporated.blob.core.windows.net/contentimages/gallery/574bc9b2-d0e0-43e3-aa71-33287a758b15-f932a3fb-4621-4e69-967c-10151ecf7b28-la-mega-mansion-underground-secret.jpg" alt="Luxury mansion" width="200" height="150">
+            <h3>Luxury Mansion</h3>
+            <p>Price: $10,000,000</p>
+            <button onclick="buyItem('Luxury Mansion', 10000000)">Buy Now</button>
+          </div>
+          <div class="shop-item">
+            <img src="https://i0.wp.com/pellucidletters.com/wp-content/uploads/2024/02/Private-Island-11.webp?resize=900%2C675&ssl=1" alt="Private island" width="200" height="150">
+            <h3>Private Island</h3>
+            <p>Price: $50,000,000</p>
+            <button onclick="buyItem('Private Island', 50000000)">Buy Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="inventory">
+      <h2>Inventory</h2>
+      <div id="inventory-items">
+        <!-- Inventory items will be dynamically added here -->
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2023 Casino Games Simulator. Tous droits réservés.</p>
+  </footer>
+
+  <script>
+    let playerBalance = 1000;
+    let playerBank = 0;
+    let playerLevel = 1;
+    let penaltyBet = 10;
+    let penaltyMultiplier = 1;
+    let activePenaltyGame = false;
+    let diceBet = 10;
+    let diceMultiplier = 1;
+    let activeDiceGame = false;
+    let inventory = [];
+
+    function updatePlayerInfo() {
+      document.getElementById('player-balance').textContent = playerBalance.toFixed(2);
+      document.getElementById('player-bank').textContent = playerBank.toFixed(2);
+      document.getElementById('player-level').textContent = playerLevel;
+    }
+
+    function deposit() {
+      const amount = parseFloat(document.getElementById('bank-amount').value);
+      if (amount > playerBalance) {
+        alert("Insufficient balance for deposit!");
+        return;
+      }
+      playerBalance -= amount;
+      playerBank += amount;
+      updatePlayerInfo();
+    }
+
+    function withdraw() {
+      const amount = parseFloat(document.getElementById('bank-amount').value);
+      if (amount > playerBank) {
+        alert("Insufficient funds in bank for withdrawal!");
+        return;
+      }
+      playerBank -= amount;
+      playerBalance += amount;
+      updatePlayerInfo();
+    }
+
+    function saveGame() {
+      const gameData = {
+        balance: playerBalance,
+        bank: playerBank,
+        level: playerLevel,
+        inventory: inventory
+      };
+      localStorage.setItem('casinoGameData', JSON.stringify(gameData));
+      alert('Game saved successfully!');
+    }
+
+    function loadGame() {
+      const savedData = localStorage.getItem('casinoGameData');
+      if (savedData) {
+        const gameData = JSON.parse(savedData);
+        playerBalance = gameData.balance;
+        playerBank = gameData.bank || 0;
+        playerLevel = gameData.level;
+        inventory = gameData.inventory || [];
+        updatePlayerInfo();
+        updateInventoryDisplay();
+        alert('Game loaded successfully!');
+      } else {
+        alert('No saved game found!');
+      }
+    }
+
+    // Penalty Shooter Game
+    function startPenaltyGame() {
+      if (activePenaltyGame) return;
+      penaltyBet = parseFloat(document.getElementById('penalty-bet').value) || 10;
+      if (penaltyBet > playerBalance) {
+        alert("Insufficient balance!");
+        return;
+      }
+      playerBalance -= penaltyBet;
+      updatePlayerInfo();
+      activePenaltyGame = true;
+      penaltyMultiplier = 1;
+      updatePenaltyInfo();
+
+      const penaltyField = document.getElementById('penalty-field');
+      penaltyField.onclick = shootPenalty;
+    }
+
+    function shootPenalty(event) {
+      if (!activePenaltyGame) return;
+
+      const penaltyField = document.getElementById('penalty-field');
+      const ball = document.getElementById('ball');
+      const goalkeeper = document.getElementById('goalkeeper');
+      const goal = document.getElementById('goal');
+
+      const rect = penaltyField.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      // Move the ball
+      ball.style.left = `${x - ball.offsetWidth / 2}px`;
+      ball.style.top = `${y - ball.offsetHeight / 2}px`;
+
+      // Randomly move the goalkeeper
+      const goalkeeperPosition = Math.random() * (goal.offsetWidth - goalkeeper.offsetWidth);
+      goalkeeper.style.left = `${goalkeeperPosition}px`;
+
+      // Check if it's a goal
+      setTimeout(() => {
+        if (Math.abs(x - (goalkeeperPosition + goalkeeper.offsetWidth / 2)) > goalkeeper.offsetWidth / 2) {
+          alert('GOAL! You scored!');
+          penaltyMultiplier += 0.5;
+        } else {
+          alert('SAVED! The goalkeeper blocked your shot.');
+          endPenaltyGame(false);
+        }
+        updatePenaltyInfo();
+
+        // Reset ball and goalkeeper positions
+        ball.style.left = '140px';
+        ball.style.top = '170px';
+        goalkeeper.style.left = '130px';
+      }, 1000);
+    }
+
+    function endPenaltyGame(win) {
+      activePenaltyGame = false;
+      const infoDiv = document.getElementById('penalty-info');
+      if (win) {
+        const winnings = penaltyBet * penaltyMultiplier;
+        playerBalance += winnings;
+        updatePlayerInfo();
+        infoDiv.textContent = `You won! Winnings: $${winnings.toFixed(2)}`;
+      } else {
+        infoDiv.textContent = `Game Over! You lost $${penaltyBet.toFixed(2)}`;
+      }
+      document.getElementById('penalty-field').onclick = null;
+    }
+
+    function cashoutPenalty() {
+      if (!activePenaltyGame) return;
+      const winnings = penaltyBet * penaltyMultiplier;
+      playerBalance += winnings;
+      updatePlayerInfo();
+      activePenaltyGame = false;
+      const infoDiv = document.getElementById('penalty-info');
+      infoDiv.textContent = `You cashed out! Winnings: $${winnings.toFixed(2)}`;
+      document.getElementById('penalty-field').onclick = null;
+    }
+
+    function updatePenaltyInfo() {
+      const infoDiv = document.getElementById('penalty-info');
+      infoDiv.textContent = `Bet: $${penaltyBet.toFixed(2)} | Multiplier: x${penaltyMultiplier.toFixed(2)}`;
+    }
+
+    // Aviator Game
+    let aviatorInterval;
+    let currentMultiplier = 1;
+    let isFlying = false;
+    let betAmount = 10;
+
+    function startAviator() {
+      if (isFlying) return;
+      betAmount = parseFloat(document.getElementById('aviator-bet').value) || 10;
+      if (betAmount > playerBalance) {
+        alert("Insufficient balance!");
+        return;
+      }
+      playerBalance -= betAmount;
+      updatePlayerInfo();
+      isFlying = true;
+      const plane = document.getElementById('aviator-plane');
+      const multiplierDisplay = document.getElementById('aviator-multiplier');
+      let height = 0;
+      currentMultiplier = 1;
+      clearInterval(aviatorInterval);
+      aviatorInterval = setInterval(() => {
+        height += 1;
+        currentMultiplier += 0.01;
+        plane.style.transform = `translateY(-${height}px) rotate(-20deg)`;
+        multiplierDisplay.textContent = `x${currentMultiplier.toFixed(2)}`;
+        if (Math.random() < 0.01 || height > 150) {
+          crashAviator();
+        }
+      }, 50);
+    }
+
+    function crashAviator() {
+      clearInterval(aviatorInterval);
+      const plane = document.getElementById('aviator-plane');
+      plane.style.transform = 'translateY(0) rotate(0deg)';
+      isFlying = false;
+      alert(`Game Over! Plane crashed at x${currentMultiplier.toFixed(2)}`);
+    }
+
+    function cashoutAviator() {
+      if (!isFlying) return;
+      clearInterval(aviatorInterval);
+      isFlying = false;
+      const winnings = betAmount * currentMultiplier;
+      playerBalance += winnings;
+      updatePlayerInfo();
+      alert(`You cashed out at x${currentMultiplier.toFixed(2)}! Winnings: $${winnings.toFixed(2)}`);
+      const plane = document.getElementById('aviator-plane');
+      plane.style.transform = 'translateY(0) rotate(0deg)';
+    }
+
+    // Dice Roll Game
+    function startDiceRoll() {
+      if (activeDiceGame) return;
+      diceBet = parseFloat(document.getElementById('dice-bet').value) || 10;
+      if (diceBet > playerBalance) {
+        alert("Insufficient balance!");
+        return;
+      }
+      playerBalance -= diceBet;
+      updatePlayerInfo();
+      activeDiceGame = true;
+      diceMultiplier = 1;
+      updateDiceInfo();
+
+      const dice = document.getElementById('dice');
+      const rollInterval = setInterval(() => {
+        const roll = Math.floor(Math.random() * 6) + 1;
+        dice.textContent = roll;
+      }, 100);
+
+      setTimeout(() => {
+        clearInterval(rollInterval);
+        const finalRoll = Math.floor(Math.random() * 6) + 1;
+        dice.textContent = finalRoll;
+        diceMultiplier = finalRoll;
+        document.getElementById('dice-multiplier').textContent = `x${diceMultiplier.toFixed(2)}`;
+        updateDiceInfo();
+      }, 2000);
+    }
+
+    function cashoutDice() {
+      if (!activeDiceGame) return;
+      const winnings = diceBet * diceMultiplier;
+      playerBalance += winnings;
+      updatePlayerInfo();
+      activeDiceGame = false;
+      const infoDiv = document.getElementById('dice-info');
+      infoDiv.textContent = `You cashed out! Winnings: $${winnings.toFixed(2)}`;
+    }
+
+    function updateDiceInfo() {
+      const infoDiv = document.getElementById('dice-info');
+      infoDiv.textContent = `Bet: $${diceBet.toFixed(2)} | Multiplier: x${diceMultiplier.toFixed(2)}`;
+    }
+
+    // Mines Game
+    let minesBet = 10;
+    let minesMultiplier = 1;
+    let activeMinesGame = false;
+    let revealedCells = 0;
+
+    function resetMines() {
+      if (activeMinesGame) {
+        if (!confirm("Are you sure you want to start a new game? You'll lose your current progress.")) {
+          return;
+        }
+      }
+      
+      minesBet = parseFloat(document.getElementById('mines-bet').value) || 10;
+      if (minesBet > playerBalance) {
+        alert("Insufficient balance!");
+        return;
+      }
+      playerBalance -= minesBet;
+      updatePlayerInfo();
+
+      const grid = document.getElementById('mines-grid');
+      grid.innerHTML = '';
+      minesMultiplier = 1;
+      activeMinesGame = true;
+      revealedCells = 0;
+      updateMinesInfo();
+
+      for (let i = 0; i < 25; i++) {
+        const cell = document.createElement('div');
+        cell.classList.add('mine-cell');
+        cell.onclick = () => revealCell(cell);
+        grid.appendChild(cell);
+      }
+    }
+
+    function revealCell(cell) {
+      if (!activeMinesGame) return;
+      
+      if (Math.random() < 0.2) {
+        cell.style.backgroundColor = '#B22222';
+        endMinesGame(false);
+      } else {
+        cell.style.backgroundColor = '#4CAF50';
+        revealedCells++;
+        minesMultiplier += 0.2;
+        updateMinesInfo();
+      }
+    }
+
+    function endMinesGame(win) {
+      activeMinesGame = false;
+      const infoDiv = document.getElementById('mines-info');
+      if (win) {
+        const winnings = minesBet * minesMultiplier;
+        playerBalance += winnings;
+        updatePlayerInfo();
+        infoDiv.textContent = `You won! Winnings: $${winnings.toFixed(2)}`;
+      } else {
+        infoDiv.textContent = `Game Over! You lost $${minesBet.toFixed(2)}`;
+      }
+    }
+
+    function cashoutMines() {
+      if (!activeMinesGame) return;
+      const winnings = minesBet * minesMultiplier;
+      playerBalance += winnings;
+      updatePlayerInfo();
+      activeMinesGame = false;
+      const infoDiv = document.getElementById('mines-info');
+      infoDiv.textContent = `You cashed out! Winnings: $${winnings.toFixed(2)}`;
+    }
+
+    function updateMinesInfo() {
+      const infoDiv = document.getElementById('mines-info');
+      infoDiv.textContent = `Bet: $${minesBet.toFixed(2)} | Multiplier: x${minesMultiplier.toFixed(2)} | Revealed: ${revealedCells}`;
+    }
+
+    // Luxury Shop
+    function buyItem(itemName, price) {
+      if (playerBalance >= price) {
+        playerBalance -= price;
+        updatePlayerInfo();
+        inventory.push(itemName);
+        updateInventoryDisplay();
+        alert(`Congratulations! You've purchased the ${itemName} for $${price.toFixed(2)}.`);
+      } else {
+        alert("Insufficient balance to purchase this item.");
+      }
+    }
+
+    function updateInventoryDisplay() {
+      const inventoryItems = document.getElementById('inventory-items');
+      inventoryItems.innerHTML = '';
+      inventory.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.classList.add('inventory-item');
+        itemElement.innerHTML = `
+          <img src="https://example.com/${item.toLowerCase().replace(/ /g, '-')}.jpg" alt="${item}">
+          <p>${item}</p>
+        `;
+        inventoryItems.appendChild(itemElement);
+      });
+    }
+
+    // Initialize games
+    updatePlayerInfo();
+    resetMines();
+    updateInventoryDisplay();
+  </script>
+</body></html>
